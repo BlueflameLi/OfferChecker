@@ -1,0 +1,27 @@
+{
+    "email": {
+        "smtp_server": "smtp.qq.com",
+        "sender": "发送邮箱",
+        "password": "smtp授权码",
+        "receiver": "接收邮箱"
+    },
+    "companies": [
+        {
+            "name": "网易雷火",
+            "cookie": "填Cookie"
+        },
+        {
+            "name": "米哈游",
+            "cookie": "米哈游填Authorization"
+        },
+        {
+            "name": "网易互娱",
+            "cookie": "填Cookie"
+        }
+    ],
+    "WORK_HOURS": {
+        "start_hour": 10,
+        "end_hour": 20
+    },
+    "sleep_seconds": 3600
+}
