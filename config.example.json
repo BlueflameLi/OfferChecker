@@ -12,7 +12,9 @@
         },
         {
             "name": "米哈游",
-            "cookie": "米哈游填Authorization"
+            "header": {
+                "Authorization": "填Authorization"
+            }
         },
         {
             "name": "网易互娱",

@@ -29,6 +29,7 @@ class CompanyMonitor:
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
         }
+        self.sessionHeader = config.get("header", {})
         self.session = requests.Session()
 
     def login(self):
@@ -158,7 +159,7 @@ class NeteaseLeihuoMonitor(CompanyMonitor):
 
 class MiHoYoMonitor(CompanyMonitor):
     def login(self):
-        self.session.headers.update({"Authorization": self.cookie})
+        self.session.headers.update(self.sessionHeader)
         return True  # 假设Cookie有效
 
     def fetch_status(self):
@@ -366,5 +367,5 @@ def main():
 
 
 if __name__ == "__main__":
-
+    print("Starting monitor...")
     main()
