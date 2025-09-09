@@ -6,7 +6,8 @@ import logging
 from email.mime.text import MIMEText
 from pathlib import Path
 import datetime
-
+import base64
+from Crypto.Cipher import AES as _AES
 
 # ----------------- 基础配置 -----------------
 CONFIG_FILE = "config.json"
@@ -26,6 +27,7 @@ class CompanyMonitor:
         self.company_name = config.get("name")
         self.position_id = config.get("position_id")
         self.cookie = config.get("cookie")
+        self.request_body = config.get("request_body", {})
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
         }
@@ -290,6 +292,96 @@ class NeteaseHuyuMonitor(CompanyMonitor):
             return None
 
 
+def aes_decrypt(content: str, key=None, IV=None):
+    cipher = _AES.new(key, _AES.MODE_CBC, IV)
+    content = base64.b64decode(content)
+    return (cipher.decrypt(content).decode("utf-8")).replace("\n", "")
+
+
+class MokaHRMonitor(CompanyMonitor):
+    def login(self):
+        """维持原有Cookie登录方式，请替换为有效SESSION"""
+        self.session.headers.update(
+            {
+                "Cookie": self.cookie,
+            }
+        )
+        return True  # 假设Cookie有效
+
+    def fetch_status(self):
+        """解析新版接口数据结构"""
+        try:
+            api_url = "https://app.mokahr.com/api/outer/ats-apply/personal-center/applications"
+            response = self.session.post(
+                api_url, json=self.request_body, headers=self.headers
+            )
+            response.raise_for_status()
+
+            data = response.json()
+
+            base64Data = data["data"]
+            necromancer = data["necromancer"]
+
+            AES_KEY = necromancer.encode("utf-8")
+            AES_IV = "de7c21ed8d6f50fe".encode("utf-8")
+
+            dec_data = aes_decrypt(base64Data, AES_KEY, AES_IV)
+
+            data_json = json.loads(dec_data)
+
+            if data_json["code"] != 0 or not data_json.get("data"):
+                logging.error(f"接口响应异常: {data_json.get('message')}")
+                return None
+
+            # 获取所有有效申请记录
+            campusApplyList = [
+                item
+                for item in data_json["data"]["campusApplyList"]
+                if item["id"] == self.request_body["orgId"]
+            ]
+
+            if not campusApplyList:
+                logging.warning("没有有效的投递记录")
+                return "无有效投递"
+
+            valid_records = [
+                item
+                for item in campusApplyList[0]["candidateApps"][0]["projectApps"][0][
+                    "apps"
+                ]
+            ]
+
+            if not valid_records:
+                logging.warning("没有有效的投递记录")
+                return "无有效投递"
+
+            # 优先匹配配置的岗位ID
+            if self.position_id:
+                target_record = next(
+                    (
+                        item
+                        for item in valid_records
+                        if item["appId"] == self.position_id
+                    ),
+                    None,
+                )
+                if not target_record:
+                    logging.warning(f"未找到ID为{self.target_position_id}的岗位")
+                    return None
+            else:
+                # 未配置ID时取第一个有效记录
+                target_record = valid_records[0]
+
+            # 组合关键信息
+            status_info = f"{target_record['orgName']} - {target_record['jobTitle']} - {target_record['stage']}"
+
+            return status_info
+
+        except Exception as e:     
+            logging.error(f"状态解析失败: {str(e)}")
+            return None
+
+
 # ----------------- 主程序 -----------------
 def main():
 
@@ -305,6 +397,8 @@ def main():
             monitors.append(MiHoYoMonitor(company))
         elif company["name"] == "网易互娱":
             monitors.append(NeteaseHuyuMonitor(company))
+        elif company["name"] == "MokaHR":
+            monitors.append(MokaHRMonitor(company))
         # 添加其他公司...
 
     WORK_HOURS = config["WORK_HOURS"]

@@ -19,6 +19,14 @@
         {
             "name": "网易互娱",
             "cookie": "填Cookie"
+        },
+        {
+            "name": "MokaHR",
+            "request_body": {
+                "orgId": "hypergryph(以鹰角为例)",
+                "siteId": 26326
+            },
+            "cookie": "填Cookie"
         }
     ],
     "WORK_HOURS": {
