@@ -209,6 +209,7 @@ cp config.example.json config/config.json
 ```bash
 docker run -d \
     --name offerchecker \
+    -e TZ=Asia/Shanghai \
     -e CONFIG_PATH=/config/config.json \
     -e STATE_FILE_PATH=/config/last_state.json \
     -e LOG_PATH=/config/monitor.log \
@@ -219,6 +220,7 @@ docker run -d \
 - `CONFIG_PATH` 指向容器内的配置文件路径；通过挂载方式将宿主的 `config.json` 映射进去
 - `STATE_FILE_PATH` 与 `LOG_PATH` 默认都位于 `/config` 目录下，和配置放在一起便于整体备份
 - 若需要自定义日志策略，可在 `config.json` 的 `logging` 字段中调整
+- `TZ` 默认为 `Asia/Shanghai`，可根据需要改成其他时区（例如 `UTC`）
 
 ### 3. 使用自定义镜像名
 
@@ -241,7 +243,7 @@ docker compose up -d
 
 - 默认使用镜像 `ghcr.io/blueflammeli/offerchecker:latest`
 - `/config` 挂载到宿主的 `./config` 目录，日志与状态文件也会保存在其中
-- 可通过 `.env` 或直接修改 `docker-compose.yml` 来调整镜像标签或环境变量
+- 可通过 `.env` 或直接修改 `docker-compose.yml` 来调整镜像标签、时区（`TZ`）或其他环境变量
 
 
 

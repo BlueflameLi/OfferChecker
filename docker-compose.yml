@@ -6,8 +6,9 @@ services:
     container_name: offerchecker
     restart: unless-stopped
     environment:
+      TZ: Asia/Shanghai
       CONFIG_PATH: /config/config.json
       STATE_FILE_PATH: /config/last_state.json
       LOG_PATH: /config/monitor.log
     volumes:
-      - ./config:/config
+      - /opt/1panel/apps/offerchecker:/config
