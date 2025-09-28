@@ -8,17 +8,69 @@ from pathlib import Path
 import datetime
 import base64
 from Crypto.Cipher import AES as _AES
+from typing import Optional
 
 # ----------------- 基础配置 -----------------
 CONFIG_FILE = "config.json"
 STATE_FILE = "last_state.json"
 LOG_FILE = "monitor.log"
 
-logging.basicConfig(
-    filename=LOG_FILE,
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-)
+# 统一初始化日志：支持控制台、文件或二者同时输出，可通过 config.json 配置覆盖
+
+
+def setup_logging(cfg: Optional[dict] = None):
+    """初始化日志系统
+
+    支持配置项（在 config.json 顶层可添加 logging 字段）：
+    {
+      "logging": {
+        "console_enabled": true,
+        "file_enabled": true,
+        "file": "monitor.log",
+        "level": "INFO",
+        "format": "%(asctime)s - %(levelname)s - %(message)s"
+      }
+    }
+    若未提供配置，则默认开启控制台与文件双输出，日志文件为 monitor.log。
+    """
+    log_cfg = (cfg or {}).get("logging", {})
+
+    console_enabled = log_cfg.get("console_enabled", True)
+    file_enabled = log_cfg.get("file_enabled", True)
+    log_file = log_cfg.get("file", LOG_FILE)
+    level_str = str(log_cfg.get("level", "INFO")).upper()
+    fmt = log_cfg.get("format", "%(asctime)s - %(levelname)s - %(message)s")
+
+    level = getattr(logging, level_str, logging.INFO)
+
+    root = logging.getLogger()
+    root.setLevel(level)
+
+    # 清理已有 handler，避免重复添加
+    for h in list(root.handlers):
+        root.removeHandler(h)
+
+    formatter = logging.Formatter(fmt)
+
+    # 允许日志输出
+    if console_enabled or file_enabled:
+        logging.disable(logging.NOTSET)
+
+    if console_enabled:
+        ch = logging.StreamHandler()
+        ch.setLevel(level)
+        ch.setFormatter(formatter)
+        root.addHandler(ch)
+
+    if file_enabled:
+        fh = logging.FileHandler(log_file, encoding="utf-8")
+        fh.setLevel(level)
+        fh.setFormatter(formatter)
+        root.addHandler(fh)
+
+    if not console_enabled and not file_enabled:
+        # 完全禁用日志输出
+        logging.disable(logging.CRITICAL)
 
 
 # ----------------- 基类定义 -----------------
@@ -377,7 +429,7 @@ class MokaHRMonitor(CompanyMonitor):
 
             return status_info
 
-        except Exception as e:     
+        except Exception as e:
             logging.error(f"状态解析失败: {str(e)}")
             return None
 
@@ -387,6 +439,9 @@ def main():
 
     with open(CONFIG_FILE) as f:
         config = json.load(f)
+
+    # 初始化日志（支持 console/file/both）
+    setup_logging(config)
 
     # 初始化监控器
     monitors = []

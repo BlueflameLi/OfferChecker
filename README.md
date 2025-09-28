@@ -10,3 +10,25 @@ Deepseek 写的，凑合能用，支持以下几个
     - 鹰角的是{ "orgId": "hypergryph","siteId": 26326}
 - 未来可能支持腾讯，那个也比较麻烦
 
+
+## 日志输出
+
+支持将日志输出到控制台、文件，或二者同时输出。默认二者同时开启。
+
+在 `config.json` 顶层添加（或使用示例中的默认值）：
+
+```json
+"logging": {
+    "console_enabled": true,
+    "file_enabled": true,
+    "file": "monitor.log",
+    "level": "INFO",
+    "format": "%(asctime)s - %(levelname)s - %(message)s"
+}
+```
+
+- 仅输出到控制台：设置 `file_enabled` 为 `false`
+- 仅输出到文件：设置 `console_enabled` 为 `false`
+- 两者同时输出：两者都为 `true`
+- 若两者都为 `false`，将完全禁用日志输出（不写文件、不打印控制台）
+

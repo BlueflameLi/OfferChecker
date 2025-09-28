@@ -34,4 +34,12 @@
         "end_hour": 20
     },
     "sleep_seconds": 3600
+    ,
+    "logging": {
+        "console_enabled": true,
+        "file_enabled": true,
+        "file": "monitor.log",
+        "level": "INFO",
+        "format": "%(asctime)s - %(levelname)s - %(message)s"
+    }
 }
