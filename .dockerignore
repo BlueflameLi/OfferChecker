@@ -1,0 +1,28 @@
+# Python cache and build files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Logs and local state
+*.log
+monitor.log
+last_state.json
+
+# Virtual environments and dependencies
+.venv/
+.env
+
+# Version control
+.git
+.gitignore
+
+# IDE/editor artifacts
+.vscode/
+.idea/
+
+# Tests caches
+.pytest_cache/
+
+# CI configurations not needed in image
+.github/

@@ -84,6 +84,11 @@ python main.py
 
 状态文件 `last_state.json` 会保存上一轮状态，用于判断是否“发生了变化”。你也可以删除它来“重置已读”。
 
+> 环境变量覆盖：在容器或进程环境中可通过下列变量重定向文件位置
+> - `CONFIG_PATH`：配置文件路径（默认 `config.json`）
+> - `STATE_FILE_PATH`：状态缓存路径（默认 `last_state.json`）
+> - `LOG_PATH`：默认日志文件路径（仍可在配置里覆盖）
+
 ---
 
 ## 三、支持站点与配置示例
@@ -162,6 +167,81 @@ python main.py
 3. 给出该站点需要的 `headers`（和可选 `extra`）
 
 欢迎提交 PR 改进或新增站点支持。
+
+---
+
+## 六、Docker 部署
+
+项目已提供官方 Docker 镜像构建流水线，推送到 `main` 分支会自动构建并发布到 **GitHub Container Registry**：
+
+- 镜像地址：`ghcr.io/<你的 GitHub 用户名/组织>/<仓库名>`（例如本仓库为 `ghcr.io/blueflammeli/offerchecker`）
+- 标签策略：
+    - `latest`：`main` 分支最新一次提交
+    - `<分支名>`：对应分支最新一次提交
+    - `<tag>`：与仓库 tag 一致
+    - `sha-<短提交号>`：精确提交版本
+
+### 1. 拉取镜像
+
+登录 GHCR（需要启用 `read:packages` 权限）：
+
+```bash
+echo <YOUR_GHCR_TOKEN> | docker login ghcr.io -u <YOUR_GITHUB_USERNAME> --password-stdin
+```
+
+随后拉取镜像：
+
+```bash
+docker pull ghcr.io/blueflammeli/offerchecker:latest
+```
+
+### 2. 运行容器
+
+建议使用宿主目录挂载 `/config` 目录，配置、日志与状态文件都会存放在其中：
+
+```bash
+mkdir -p config
+cp config.example.json config/config.json
+```
+
+运行容器：
+
+```bash
+docker run -d \
+    --name offerchecker \
+    -e CONFIG_PATH=/config/config.json \
+    -e STATE_FILE_PATH=/config/last_state.json \
+    -e LOG_PATH=/config/monitor.log \
+    -v $(pwd)/config:/config \
+    ghcr.io/blueflammeli/offerchecker:latest
+```
+
+- `CONFIG_PATH` 指向容器内的配置文件路径；通过挂载方式将宿主的 `config.json` 映射进去
+- `STATE_FILE_PATH` 与 `LOG_PATH` 默认都位于 `/config` 目录下，和配置放在一起便于整体备份
+- 若需要自定义日志策略，可在 `config.json` 的 `logging` 字段中调整
+
+### 3. 使用自定义镜像名
+
+如果你 fork 了仓库，可在仓库 Settings → Packages 查看自己的镜像地址。默认 workflow 会根据仓库路径自动生成小写镜像名，无需额外配置。
+
+### 4. 使用 docker-compose
+
+仓库提供了 `docker-compose.yml` 示例，方便一键启动与托管。使用前先准备配置目录：
+
+```bash
+mkdir -p config
+cp config.example.json config/config.json
+```
+
+编辑 `config/config.json` 完成各站点与邮箱配置后，执行：
+
+```bash
+docker compose up -d
+```
+
+- 默认使用镜像 `ghcr.io/blueflammeli/offerchecker:latest`
+- `/config` 挂载到宿主的 `./config` 目录，日志与状态文件也会保存在其中
+- 可通过 `.env` 或直接修改 `docker-compose.yml` 来调整镜像标签或环境变量
 
 
 

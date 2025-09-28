@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  offerchecker:
+    image: ghcr.io/blueflammeli/offerchecker:latest
+    container_name: offerchecker
+    restart: unless-stopped
+    environment:
+      CONFIG_PATH: /config/config.json
+      STATE_FILE_PATH: /config/last_state.json
+      LOG_PATH: /config/monitor.log
+    volumes:
+      - ./config:/config

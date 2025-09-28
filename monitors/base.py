@@ -1,11 +1,12 @@
 import json
 import logging
+import os
 from pathlib import Path
 import requests
 import smtplib
 from email.mime.text import MIMEText
 
-STATE_FILE = "last_state.json"
+STATE_FILE = os.environ.get("STATE_FILE_PATH", "last_state.json")
 
 
 class CompanyMonitor:
@@ -61,19 +62,22 @@ class CompanyMonitor:
             return False
 
     def load_last_state(self):
-        if not Path(STATE_FILE).exists():
+        state_path = Path(STATE_FILE)
+        if not state_path.exists():
             return None
-        with open(STATE_FILE, "r") as f:
+        with state_path.open("r", encoding="utf-8") as f:
             states = json.load(f)
             return states.get(self.company_name, None)
 
     def save_current_state(self, status):
+        state_path = Path(STATE_FILE)
         states = {}
-        if Path(STATE_FILE).exists():
-            with open(STATE_FILE, "r") as f:
+        if state_path.exists():
+            with state_path.open("r", encoding="utf-8") as f:
                 states = json.load(f)
         states[self.company_name] = status
-        with open(STATE_FILE, "w") as f:
-            json.dump(states, f)
+        state_path.parent.mkdir(parents=True, exist_ok=True)
+        with state_path.open("w", encoding="utf-8") as f:
+            json.dump(states, f, ensure_ascii=False)
 
     # --- 内部方法 ---

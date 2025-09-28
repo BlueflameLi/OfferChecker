@@ -1,4 +1,5 @@
 import time
+import os
 import json
 import logging
 import datetime
@@ -9,8 +10,8 @@ import pkgutil
 import monitors as monitors_pkg
 
 # ----------------- 基础配置 -----------------
-CONFIG_FILE = "config.json"
-LOG_FILE = "monitor.log"
+CONFIG_FILE = os.environ.get("CONFIG_PATH", "config.json")
+LOG_FILE = os.environ.get("LOG_PATH", "monitor.log")
 
 # 统一初始化日志：支持控制台、文件或二者同时输出，可通过 config.json 配置覆盖
 
@@ -73,7 +74,12 @@ def setup_logging(cfg: Optional[dict] = None):
 # ----------------- 主程序 -----------------
 def main():
 
-    with open(CONFIG_FILE) as f:
+    if not os.path.exists(CONFIG_FILE):
+        raise FileNotFoundError(
+            f"未找到配置文件: {CONFIG_FILE}。请检查路径或通过环境变量 CONFIG_PATH 指定。"
+        )
+
+    with open(CONFIG_FILE, encoding="utf-8") as f:
         config = json.load(f)
 
     # 初始化日志（支持 console/file/both）
