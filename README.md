@@ -1,11 +1,11 @@
 # OfferChecker
 
 一个“投递状态监控 + 邮件提醒”的小工具：定时查询你在各招聘网站的投递进度，有变化就发邮件通知。
-
+自动登录比较复杂，暂不支持，只能手动复制Cookie，不同网站Cookie有效时间不同，大部分应该都好几天都不会过期，但也有一天就过期的，比如米哈游  
 当前支持：
-- 网易雷火（网页端接口）
+- 网易雷火（网页端接口，绿通之类只能在微信上看的暂不支持）
 - 米哈游
-- 网易互娱（部分支持：该站点不直接显示状态，笔试和面试的状态应该可以获取，再之后的状态目前不支持（没见过）
+- 网易互娱（部分支持：互娱的状态解析很复杂，且有个字典，目前细的状态（一面、二面这种）只有面试支持，其他状态暂时只能支持到大的状态（笔试、录用审核））
 - MokaHR（以鹰角为例，其他使用 Moka 的公司也可尝试）
 
 > 说明：由于各站点登录鉴权不同，本工具通过“请求头 headers”来复用你的登录态（例如 Cookie 或 Authorization）。
@@ -106,7 +106,7 @@ python main.py
 {
     "name": "米哈游",
     "provider": "mihoyo",
-    "headers": { "Authorization": "Bearer <你的token>" }
+    "headers": { "Authorization": "ats@开头" }
 }
 ```
 
@@ -116,7 +116,7 @@ python main.py
 {
     "name": "网易互娱",
     "provider": "netease_huyu",
-    "headers": { "Cookie": "从浏览器复制的整串 Cookie（含 SESSION）" }
+    "headers": { "Cookie": "从浏览器复制的整串 Cookie" }
 }
 ```
 
@@ -126,7 +126,7 @@ python main.py
 {
     "name": "鹰角",
     "provider": "mokahr",
-    "headers": { "Cookie": "connect.sid=...; moka-token=...; ..." },
+    "headers": { "Cookie": "从浏览器复制的整串 Cookie" },
     "extra": {
         "request_body": { "orgId": "hypergryph", "siteId": 26326 }
     }

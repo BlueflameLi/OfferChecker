@@ -14,23 +14,23 @@
         {
             "name": "米哈游",
             "provider": "mihoyo",
-            "headers": {"Authorization": "Bearer <token>"}
+            "headers": {"Authorization": "ats@开头"}
         },
         {
             "name": "网易互娱",
             "provider": "netease_huyu",
-            "headers": {"Cookie": "从浏览器复制的整串 Cookie（含 SESSION）"}
+            "headers": {"Cookie": "从浏览器复制的整串 Cookie"}
         },
         {
-            "name": "MokaHR",
+            "name": "鹰角",
             "provider": "mokahr",
             "extra": {
                 "request_body": {
-                    "orgId": "hypergryph(以鹰角为例)",
+                    "orgId": "hypergryph",
                     "siteId": 26326
                 }
             },
-            "headers": {"Cookie": "connect.sid=...; moka-token=...; ..."}
+            "headers": {"Cookie": "从浏览器复制的整串 Cookie"}
         }
     ],
     "WORK_HOURS": {
