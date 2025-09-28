@@ -3,6 +3,7 @@ import os
 import json
 import logging
 import datetime
+from pathlib import Path
 from typing import Optional
 from monitors.registry import get_monitor_class
 import importlib
@@ -54,19 +55,44 @@ def setup_logging(cfg: Optional[dict] = None):
     if console_enabled or file_enabled:
         logging.disable(logging.NOTSET)
 
-    if console_enabled:
+    effective_console_enabled = console_enabled
+    file_handler = None
+    file_setup_error = None
+
+    if file_enabled:
+        try:
+            log_path = Path(log_file)
+            if log_path.exists() and log_path.is_dir():
+                raise IsADirectoryError(
+                    f"日志路径 {log_file} 指向目录，无法创建日志文件"
+                )
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            file_handler = logging.FileHandler(str(log_path), encoding="utf-8")
+        except (OSError, PermissionError) as exc:
+            file_handler = None
+            file_setup_error = exc
+            file_enabled = False
+            if not effective_console_enabled:
+                effective_console_enabled = True
+
+    if effective_console_enabled:
         ch = logging.StreamHandler()
         ch.setLevel(level)
         ch.setFormatter(formatter)
         root.addHandler(ch)
 
-    if file_enabled:
-        fh = logging.FileHandler(log_file, encoding="utf-8")
-        fh.setLevel(level)
-        fh.setFormatter(formatter)
-        root.addHandler(fh)
+    if file_handler is not None:
+        file_handler.setLevel(level)
+        file_handler.setFormatter(formatter)
+        root.addHandler(file_handler)
 
-    if not console_enabled and not file_enabled:
+    if file_setup_error:
+        root.warning(
+            "日志文件无法写入（%s），已自动退回到控制台输出。请检查路径或目录权限。",
+            file_setup_error,
+        )
+
+    if not effective_console_enabled and file_handler is None:
         # 完全禁用日志输出
         logging.disable(logging.CRITICAL)
 
