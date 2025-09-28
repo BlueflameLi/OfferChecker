@@ -8,20 +8,24 @@
     "companies": [
         {
             "name": "网易雷火",
+            "provider": "netease_leihuo",
             "cookie": "填Cookie"
         },
         {
             "name": "米哈游",
+            "provider": "mihoyo",
             "header": {
                 "Authorization": "填Authorization"
             }
         },
         {
             "name": "网易互娱",
+            "provider": "netease_huyu",
             "cookie": "填Cookie"
         },
         {
             "name": "MokaHR",
+            "provider": "mokahr",
             "request_body": {
                 "orgId": "hypergryph(以鹰角为例)",
                 "siteId": 26326
@@ -33,8 +37,7 @@
         "start_hour": 10,
         "end_hour": 20
     },
-    "sleep_seconds": 3600
-    ,
+    "sleep_seconds": 3600,
     "logging": {
         "console_enabled": true,
         "file_enabled": true,

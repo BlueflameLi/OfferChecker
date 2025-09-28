@@ -13,6 +13,15 @@ Deepseek 写的，凑合能用，支持以下几个
 
 ## 日志输出
 
+- 扩展新网站（插件式）：
+  1. 在 `monitors/` 下新增一个 `your_provider.py`
+  2. 在文件中：
+      - from `monitors.base` import `CompanyMonitor`
+      - from `monitors.registry` import `register_monitor`
+      - 用 `@register_monitor("your_provider")` 装饰你的类
+  3. 在 `config.json` 中的公司条目里加 `"provider": "your_provider"`
+  4. 若省略 `provider`，会根据 `name` 通过内置别名尝试匹配
+
 支持将日志输出到控制台、文件，或二者同时输出。默认二者同时开启。
 
 在 `config.json` 顶层添加（或使用示例中的默认值）：

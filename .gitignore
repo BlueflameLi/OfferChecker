@@ -1,3 +1,4 @@
 config.json
 monitor.log
 last_state.json
+__pycache__/
