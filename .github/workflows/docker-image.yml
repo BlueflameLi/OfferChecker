@@ -6,6 +6,13 @@ on:
       - main
     tags:
       - 'v*'
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - '**/*.md'
+      - 'docker-compose.yml'
+      - 'config.example.json'
+      - '**/.gitignore'
   workflow_dispatch:
 
 permissions:
