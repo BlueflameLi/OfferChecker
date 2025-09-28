@@ -12,11 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Create runtime directories for externalized config, logs, and state
-RUN useradd --create-home appuser \
-    && mkdir -p /config \
-    && chown -R appuser:appuser /config /app
-
-USER appuser
+RUN mkdir -p /config
 
 ENV CONFIG_PATH=/config/config.json \
     STATE_FILE_PATH=/config/last_state.json \

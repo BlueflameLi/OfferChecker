@@ -222,6 +222,7 @@ docker run -d \
 - `STATE_FILE_PATH` 与 `LOG_PATH` 默认都位于 `/config` 目录下，和配置放在一起便于整体备份
 - 若需要自定义日志策略，可在 `config.json` 的 `logging` 字段中调整
 - `TZ` 默认为 `Asia/Shanghai`，可根据需要改成其他时区（例如 `UTC`）
+- 容器默认以 root 用户运行，如需切换为其他用户可在 `docker run` 时追加 `--user <uid>:<gid>`，并确保挂载目录权限匹配
 
 ### 3. 使用自定义镜像名
 
@@ -245,6 +246,7 @@ docker compose up -d
 - 默认使用镜像 `ghcr.io/blueflammeli/offerchecker:latest`
 - `/config` 挂载到宿主的 `./config` 目录，日志与状态文件也会保存在其中
 - 可通过 `.env` 或直接修改 `docker-compose.yml` 来调整镜像标签、时区（`TZ`）或其他环境变量
+- 若希望使用非 root 用户，可在 compose 文件中添加 `user: "<uid>:<gid>"` 并相应调整权限
 
 
 
