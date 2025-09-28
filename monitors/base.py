@@ -10,15 +10,16 @@ STATE_FILE = "last_state.json"
 
 class CompanyMonitor:
     def __init__(self, config):
+        # 通用自定义配置字段，供各 Provider 按需读取，避免直接暴露完整 config
+        self.extra = config.get("extra", {})
         self.company_name = config.get("name")
         self.position_id = config.get("position_id")
-        self.cookie = config.get("cookie")
-        self.request_body = config.get("request_body", {})
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
         }
-        self.sessionHeader = config.get("header", {})
         self.session = requests.Session()
+        # 顶层 headers 统一鉴权（包含 Cookie/Authorization 等）
+        self.headers.update(config.get("headers", {}))
 
     def login(self):
         raise NotImplementedError
@@ -74,3 +75,5 @@ class CompanyMonitor:
         states[self.company_name] = status
         with open(STATE_FILE, "w") as f:
             json.dump(states, f)
+
+    # --- 内部方法 ---

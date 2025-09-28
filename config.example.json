@@ -9,28 +9,28 @@
         {
             "name": "网易雷火",
             "provider": "netease_leihuo",
-            "cookie": "填Cookie"
+            "headers": {"Cookie": "从浏览器复制的整串 Cookie"}
         },
         {
             "name": "米哈游",
             "provider": "mihoyo",
-            "header": {
-                "Authorization": "填Authorization"
-            }
+            "headers": {"Authorization": "Bearer <token>"}
         },
         {
             "name": "网易互娱",
             "provider": "netease_huyu",
-            "cookie": "填Cookie"
+            "headers": {"Cookie": "从浏览器复制的整串 Cookie（含 SESSION）"}
         },
         {
             "name": "MokaHR",
             "provider": "mokahr",
-            "request_body": {
-                "orgId": "hypergryph(以鹰角为例)",
-                "siteId": 26326
+            "extra": {
+                "request_body": {
+                    "orgId": "hypergryph(以鹰角为例)",
+                    "siteId": 26326
+                }
             },
-            "cookie": "填Cookie"
+            "headers": {"Cookie": "connect.sid=...; moka-token=...; ..."}
         }
     ],
     "WORK_HOURS": {

@@ -10,7 +10,6 @@ import monitors as monitors_pkg
 
 # ----------------- 基础配置 -----------------
 CONFIG_FILE = "config.json"
-STATE_FILE = "last_state.json"
 LOG_FILE = "monitor.log"
 
 # 统一初始化日志：支持控制台、文件或二者同时输出，可通过 config.json 配置覆盖

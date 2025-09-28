@@ -7,7 +7,8 @@ from monitors.registry import register_monitor
 class NeteaseHuyuMonitor(CompanyMonitor):
     def __init__(self, config):
         super().__init__(config)
-        self.h_map = {
+        # 面试阶段映射，允许通过 extra.h_map 覆盖
+        default_map = {
             "I0010001": "hr一面",
             "I0010002": "hr二面",
             "I0010003": "hr三面",
@@ -18,9 +19,10 @@ class NeteaseHuyuMonitor(CompanyMonitor):
             "I0030002": "追加二面",
             "I0030003": "追加三面",
         }
+        self.h_map = {**default_map, **self.extra.get("h_map", {})}
 
     def login(self):
-        self.session.cookies.update({"SESSION": self.cookie})
+        # 基类已应用鉴权，这里通常无需额外处理
         return True
 
     def fetch_status(self):

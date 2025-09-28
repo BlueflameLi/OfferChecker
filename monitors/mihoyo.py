@@ -6,13 +6,15 @@ from monitors.registry import register_monitor
 @register_monitor("mihoyo")
 class MiHoYoMonitor(CompanyMonitor):
     def login(self):
-        self.session.headers.update(self.sessionHeader)
+        # 基类已应用鉴权，这里通常无需额外处理
         return True
 
     def fetch_status(self):
         try:
             api_url = "https://ats.openout.mihoyo.com/ats-portal/v1/apply_job/list"
-            request_body = {"pageNo": 1, "pageSize": 10}
+            default_body = {"pageNo": 1, "pageSize": 10}
+            body_override = self.extra.get("request_body", {})
+            request_body = {**default_body, **body_override}
 
             response = self.session.post(api_url, json=request_body, headers=self.headers)
             response.raise_for_status()

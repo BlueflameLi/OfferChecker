@@ -7,7 +7,7 @@ from monitors.registry import register_monitor
 @register_monitor("netease_leihuo")
 class NeteaseLeihuoMonitor(CompanyMonitor):
     def login(self):
-        self.session.cookies.update({"SESSION": self.cookie})
+        # 基类已应用鉴权，这里通常无需额外处理
         return True
 
     def fetch_status(self):

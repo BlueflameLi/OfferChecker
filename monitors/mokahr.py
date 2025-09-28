@@ -15,13 +15,16 @@ def _aes_decrypt(content: str, key=None, IV=None):
 @register_monitor("mokahr")
 class MokaHRMonitor(CompanyMonitor):
     def login(self):
-        self.session.headers.update({"Cookie": self.cookie})
+        # 基类已应用鉴权，这里通常无需额外处理
         return True
 
     def fetch_status(self):
         try:
             api_url = "https://app.mokahr.com/api/outer/ats-apply/personal-center/applications"
-            response = self.session.post(api_url, json=self.request_body, headers=self.headers)
+            default_body = {}
+            body_override = self.extra.get("request_body", {})
+            request_body = {**default_body, **body_override}
+            response = self.session.post(api_url, json=request_body, headers=self.headers)
             response.raise_for_status()
 
             data = response.json()
@@ -43,7 +46,7 @@ class MokaHRMonitor(CompanyMonitor):
             campusApplyList = [
                 item
                 for item in data_json["data"]["campusApplyList"]
-                if item["id"] == self.request_body["orgId"]
+                if item["id"] == request_body.get("orgId")
             ]
 
             if not campusApplyList:
