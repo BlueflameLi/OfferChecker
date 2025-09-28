@@ -11,4 +11,4 @@ services:
       STATE_FILE_PATH: /config/last_state.json
       LOG_PATH: /config/monitor.log
     volumes:
-      - /opt/1panel/apps/offerchecker:/config
+      - ./config:/config
